@@ -59,12 +59,18 @@ function App() {
         </li>
     );
 
-    const InputWithLabel = ({ id, label, value, type = "text", onInputChange }) => {
+    const InputWithLabel = ({ id, label, value, type = "text", onInputChange, isFocused }) => {
+        const inputRef = React.useRef();
+        React.useEffect(() => {
+            if (isFocused && inputRef.current) {
+                inputRef.current.focus();
+            }
+        }, [isFocused]);
         return (
             <>
                 <label htmlFor={id}>{label}</label>
                 &nbsp;
-                <input id={id} type={type} onChange={onInputChange} value={value}></input>
+                <input ref={inputRef} id={id} type={type} onChange={onInputChange} value={value} />
             </>
         );
     };
@@ -72,7 +78,7 @@ function App() {
     return (
         <div>
             <h1>Frontend frameworks</h1>
-            <InputWithLabel id="search" label="Search" value={searchTerm} onInputChange={handleSearch}></InputWithLabel>
+            <InputWithLabel id="search" label="Search" value={searchTerm} onInputChange={handleSearch} isFocused></InputWithLabel>
             <List list={stories.filter((item) => item.title.toLowerCase().includes(searchTerm.toLowerCase()))}></List>
         </div>
     );
