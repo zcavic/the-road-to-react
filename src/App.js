@@ -1,5 +1,6 @@
 import React from "react";
 
+// custom hok
 const useStorageSpace = (key, initialState) => {
     const [value, setValue] = React.useState(localStorage.getItem(key) || initialState);
     React.useEffect(() => {
@@ -9,6 +10,7 @@ const useStorageSpace = (key, initialState) => {
 };
 
 function App() {
+    // data
     const initialStories = [
         {
             title: "React",
@@ -36,19 +38,23 @@ function App() {
         }
     ];
 
+    // usage of custom hok
     const [searchTerm, setSearchTerm] = useStorageSpace("search", "r");
+    // usage of builtin hok
     const [stories, setStories] = React.useState(initialStories);
 
+    // callback method
     const handleSearch = (event) => {
         console.log(event.target.value);
         setSearchTerm(event.target.value);
     };
-
+    // callback method
     const handleRemoveStory = (item) => {
         const newStories = stories.filter((story) => story.key !== item.key);
         setStories(newStories);
     };
 
+    // react component
     const List = ({ list }) => (
         <ul>
             {list.map((item) => (
@@ -56,7 +62,7 @@ function App() {
             ))}
         </ul>
     );
-
+    // react component
     const Item = ({ item, onRemove }) => (
         <li>
             <span>
@@ -69,7 +75,7 @@ function App() {
             </span>
         </li>
     );
-
+    // generic react component
     const InputWithLabel = ({ id, label, value, type = "text", onInputChange, isFocused }) => {
         const inputRef = React.useRef();
         React.useEffect(() => {
