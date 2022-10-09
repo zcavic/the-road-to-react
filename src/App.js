@@ -28,38 +28,36 @@ function App() {
         }
     ];
 
+    const [searchTerm, setSearchTerm] = React.useState("React");
+
     const handleSearch = (event) => {
         console.log(event.target.value);
+        setSearchTerm(event.target.value);
     };
 
-    const List = (props) => (
+    const List = ({ list }) => (
         <ul>
-            {props.list.map((item) => (
+            {list.map((item) => (
                 <Item key={item.key} item={item}></Item>
             ))}
         </ul>
     );
 
-    const Item = (props) => (
+    const Item = ({ item }) => (
         <li>
             <span>
-                <a href={props.item.url}>{props.item.title}</a>
+                <a href={item.url}>{item.title}</a>
             </span>
         </li>
     );
 
-    const Search = (props) => {
-        const [searchTerm, setSearchTerm] = React.useState("");
-        const handleChange = (event) => {
-            setSearchTerm(event.target.value);
-            props.onSearch(event);
-        };
+    const Search = ({ onSearch, search }) => {
         return (
             <div>
                 <label htmlFor="search">Search:</label>
-                <input id="search" type="text" onChange={handleChange}></input>
+                <input id="search" type="text" onChange={onSearch} value={search}></input>
                 <p>
-                    Search for <strong>{searchTerm}</strong>
+                    Search for <strong>...</strong>
                 </p>
             </div>
         );
@@ -68,8 +66,8 @@ function App() {
     return (
         <div>
             <h1>Frontend frameworks</h1>
-            <Search onSearch={handleSearch}></Search>
-            <List list={stories}></List>
+            <Search onSearch={handleSearch} search={searchTerm}></Search>
+            <List list={stories.filter((item) => item.title.toLowerCase().includes(searchTerm.toLowerCase()))}></List>
         </div>
     );
 }
