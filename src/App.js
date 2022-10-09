@@ -1,5 +1,13 @@
 import React from "react";
 
+const useStorageSpace = (key, initialState) => {
+    const [value, setValue] = React.useState(localStorage.getItem(key) || initialState);
+    React.useEffect(() => {
+        localStorage.setItem(key, value);
+    }, [value, key]);
+    return [value, setValue];
+};
+
 function App() {
     const stories = [
         {
@@ -28,7 +36,7 @@ function App() {
         }
     ];
 
-    const [searchTerm, setSearchTerm] = React.useState("React");
+    const [searchTerm, setSearchTerm] = useStorageSpace("search", "r");
 
     const handleSearch = (event) => {
         console.log(event.target.value);
