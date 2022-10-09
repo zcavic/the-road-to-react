@@ -39,7 +39,7 @@ function App() {
     ];
 
     // usage of custom hok
-    const [searchTerm, setSearchTerm] = useStorageSpace("search", "r");
+    const [searchTerm, setSearchTerm] = useStorageSpace("search", "");
     // usage of builtin hok
     const [stories, setStories] = React.useState(initialStories);
 
