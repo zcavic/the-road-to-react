@@ -9,7 +9,7 @@ const useStorageSpace = (key, initialState) => {
 };
 
 function App() {
-    const stories = [
+    const initialStories = [
         {
             title: "React",
             url: "some url",
@@ -37,24 +37,35 @@ function App() {
     ];
 
     const [searchTerm, setSearchTerm] = useStorageSpace("search", "r");
+    const [stories, setStories] = React.useState(initialStories);
 
     const handleSearch = (event) => {
         console.log(event.target.value);
         setSearchTerm(event.target.value);
     };
 
+    const handleRemoveStory = (item) => {
+        const newStories = stories.filter((story) => story.key !== item.key);
+        setStories(newStories);
+    };
+
     const List = ({ list }) => (
         <ul>
             {list.map((item) => (
-                <Item key={item.key} item={item}></Item>
+                <Item key={item.key} item={item} onRemove={handleRemoveStory}></Item>
             ))}
         </ul>
     );
 
-    const Item = ({ item }) => (
+    const Item = ({ item, onRemove }) => (
         <li>
             <span>
                 <a href={item.url}>{item.title}</a>
+            </span>
+            <span>
+                <button type="button" onClick={() => onRemove(item)}>
+                    Remove
+                </button>
             </span>
         </li>
     );
