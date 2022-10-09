@@ -41,7 +41,22 @@ function App() {
     // usage of custom hok
     const [searchTerm, setSearchTerm] = useStorageSpace("search", "");
     // usage of builtin hok
-    const [stories, setStories] = React.useState(initialStories);
+    const [stories, setStories] = React.useState([]);
+    const [isLoading, setIsLoading] = React.useState(false);
+    const [isError, setIsError] = React.useState(false);
+
+    // simulate obtaining data from remote API
+    const getDataAsync = () => new Promise((resolve) => setTimeout(() => resolve({ data: { stories: initialStories } }), 2000));
+    // save data after obtaining them from remote API
+    React.useEffect(() => {
+        setIsLoading(true);
+        getDataAsync()
+            .then((result) => {
+                setStories(result.data.stories);
+                setIsLoading(false);
+            })
+            .catch(() => setIsError(true));
+    }, []);
 
     // callback method
     const handleSearch = (event) => {
@@ -96,7 +111,12 @@ function App() {
         <div>
             <h1>Frontend frameworks</h1>
             <InputWithLabel id="search" label="Search" value={searchTerm} onInputChange={handleSearch} isFocused></InputWithLabel>
-            <List list={stories.filter((item) => item.title.toLowerCase().includes(searchTerm.toLowerCase()))}></List>
+            {isError && <p>Something went wrong...</p>}
+            {isLoading ? (
+                <p>Loading...</p>
+            ) : (
+                <List list={stories.filter((item) => item.title.toLowerCase().includes(searchTerm.toLowerCase()))}></List>
+            )}
         </div>
     );
 }
