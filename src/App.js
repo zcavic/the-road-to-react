@@ -59,22 +59,20 @@ function App() {
         </li>
     );
 
-    const Search = ({ onSearch, search }) => {
+    const InputWithLabel = ({ id, label, value, type = "text", onInputChange }) => {
         return (
-            <div>
-                <label htmlFor="search">Search:</label>
-                <input id="search" type="text" onChange={onSearch} value={search}></input>
-                <p>
-                    Search for <strong>...</strong>
-                </p>
-            </div>
+            <>
+                <label htmlFor={id}>{label}</label>
+                &nbsp;
+                <input id={id} type={type} onChange={onInputChange} value={value}></input>
+            </>
         );
     };
 
     return (
         <div>
             <h1>Frontend frameworks</h1>
-            <Search onSearch={handleSearch} search={searchTerm}></Search>
+            <InputWithLabel id="search" label="Search" value={searchTerm} onInputChange={handleSearch}></InputWithLabel>
             <List list={stories.filter((item) => item.title.toLowerCase().includes(searchTerm.toLowerCase()))}></List>
         </div>
     );
