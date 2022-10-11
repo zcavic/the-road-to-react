@@ -8,6 +8,36 @@ const useStorageSpace = (key, initialState) => {
     }, [value, key]);
     return [value, setValue];
 };
+const storiesReducer = (state, action) => {
+    switch (action.type) {
+        case "STORIES_FETCH_INIT":
+            return {
+                ...state,
+                isLoading: true,
+                isError: false
+            };
+        case "STORIES_FETCH_SUCCESS":
+            return {
+                ...state,
+                isLoading: false,
+                isError: false,
+                data: action.payload
+            };
+        case "STORIES_FETCH_FAILURE":
+            return {
+                ...state,
+                isLoading: false,
+                isError: true
+            };
+        case "REMOVE_STORIES":
+            return {
+                ...state,
+                data: state.data.filter((story) => action.payload.key !== story.key)
+            };
+        default:
+            throw new Error(`Action is invalid. Action: ${action.type}`);
+    }
+};
 
 function App() {
     // data
@@ -41,21 +71,18 @@ function App() {
     // usage of custom hok
     const [searchTerm, setSearchTerm] = useStorageSpace("search", "");
     // usage of builtin hok
-    const [stories, setStories] = React.useState([]);
-    const [isLoading, setIsLoading] = React.useState(false);
-    const [isError, setIsError] = React.useState(false);
+    const [stories, dispatchStories] = React.useReducer(storiesReducer, { data: [], isLoading: false, isError: false });
 
     // simulate obtaining data from remote API
-    const getDataAsync = () => new Promise((resolve) => setTimeout(() => resolve({ data: { stories: initialStories } }), 2000));
+    const getDataAsync = () => new Promise((resolve, reject) => setTimeout(() => resolve({ data: { stories: initialStories } }), 2000));
     // save data after obtaining them from remote API
     React.useEffect(() => {
-        setIsLoading(true);
+        dispatchStories({ type: "STORIES_FETCH_INIT" });
         getDataAsync()
             .then((result) => {
-                setStories(result.data.stories);
-                setIsLoading(false);
+                dispatchStories({ type: "STORIES_FETCH_SUCCESS", payload: result.data.stories });
             })
-            .catch(() => setIsError(true));
+            .catch(() => dispatchStories({ type: "STORIES_FETCH_FAILURE" }));
     }, []);
 
     // callback method
@@ -65,9 +92,10 @@ function App() {
     };
     // callback method
     const handleRemoveStory = (item) => {
-        const newStories = stories.filter((story) => story.key !== item.key);
-        setStories(newStories);
+        dispatchStories({ type: "REMOVE_STORIES", payload: item });
     };
+    // callback method
+    const searchStories = stories.data.filter((story) => story.title.toLowerCase().includes(searchTerm.toLowerCase()));
 
     // react component
     const List = ({ list }) => (
@@ -111,12 +139,8 @@ function App() {
         <div>
             <h1>Frontend frameworks</h1>
             <InputWithLabel id="search" label="Search" value={searchTerm} onInputChange={handleSearch} isFocused></InputWithLabel>
-            {isError && <p>Something went wrong...</p>}
-            {isLoading ? (
-                <p>Loading...</p>
-            ) : (
-                <List list={stories.filter((item) => item.title.toLowerCase().includes(searchTerm.toLowerCase()))}></List>
-            )}
+            {stories.isError && <p>Something went wrong...</p>}
+            {stories.isLoading ? <p>Loading...</p> : <List list={searchStories} onRemoveItem={handleRemoveStory}></List>}
         </div>
     );
 }
